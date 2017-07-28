@@ -1,0 +1,12 @@
+{
+    "name": "elm-investment-calculator",
+    "version": "1.0.0",
+    "description": "",
+    "main": "calculator.js",
+    "scripts": {
+        "make": "elm-make calculator.elm --output=calculator.js",
+        "uglify": "uglifyjs calculator.js -m -c sequences,dead_code,conditionals,booleans,unused,if_return,join_vars,drop_console -o calculator.min.js"
+    },
+    "author": "",
+    "license": "MIT"
+}
