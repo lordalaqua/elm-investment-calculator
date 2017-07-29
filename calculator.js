@@ -8260,59 +8260,125 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Main$viewValidation = function (model) {
-	var _p0 = _elm_lang$core$Native_Utils.eq(model.password, model.passwordAgain) ? {ctor: '_Tuple2', _0: 'green', _1: 'OK'} : {ctor: '_Tuple2', _0: 'red', _1: 'Passwords do not match!'};
-	var color = _p0._0;
-	var message = _p0._1;
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'color', _1: color},
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(message),
-			_1: {ctor: '[]'}
-		});
+var _user$project$Main$Model = F2(
+	function (a, b) {
+		return {form: a, results: b};
+	});
+var _user$project$Main$Yearly = {ctor: 'Yearly'};
+var _user$project$Main$Monthly = {ctor: 'Monthly'};
+var _user$project$Main$rateTypetoString = function (t) {
+	return _elm_lang$core$Native_Utils.eq(t, _user$project$Main$Monthly) ? 'Mensal' : 'Anual';
+};
+var _user$project$Main$stringToRateType = function (t) {
+	return _elm_lang$core$Native_Utils.eq(t, 'Mensal') ? _user$project$Main$Monthly : _user$project$Main$Yearly;
+};
+var _user$project$Main$Years = {ctor: 'Years'};
+var _user$project$Main$model = A2(
+	_user$project$Main$Model,
+	{start_value: 0.0, deposit: 0.0, rate: 0.0, rate_type: _user$project$Main$Yearly, time: 0, time_type: _user$project$Main$Years},
+	{});
+var _user$project$Main$Months = {ctor: 'Months'};
+var _user$project$Main$timeTypetoString = function (t) {
+	return _elm_lang$core$Native_Utils.eq(t, _user$project$Main$Months) ? 'Meses' : 'Anos';
+};
+var _user$project$Main$stringToTimeType = function (t) {
+	return _elm_lang$core$Native_Utils.eq(t, 'Meses') ? _user$project$Main$Months : _user$project$Main$Years;
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
-			case 'Name':
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'StartValue':
+				var old_form = model.form;
+				var new_form = _elm_lang$core$Native_Utils.update(
+					old_form,
+					{
+						start_value: A2(
+							_elm_lang$core$Result$withDefault,
+							0,
+							_elm_lang$core$String$toFloat(_p0._0))
+					});
 				return _elm_lang$core$Native_Utils.update(
 					model,
-					{name: _p1._0});
-			case 'Password':
+					{form: new_form});
+			case 'Deposit':
+				var old_form = model.form;
+				var new_form = _elm_lang$core$Native_Utils.update(
+					old_form,
+					{
+						deposit: A2(
+							_elm_lang$core$Result$withDefault,
+							0,
+							_elm_lang$core$String$toFloat(_p0._0))
+					});
 				return _elm_lang$core$Native_Utils.update(
 					model,
-					{password: _p1._0});
+					{form: new_form});
+			case 'Rate':
+				var old_form = model.form;
+				var new_form = _elm_lang$core$Native_Utils.update(
+					old_form,
+					{
+						rate: A2(
+							_elm_lang$core$Result$withDefault,
+							0,
+							_elm_lang$core$String$toFloat(_p0._0))
+					});
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{form: new_form});
+			case 'RateKind':
+				var old_form = model.form;
+				var new_form = _elm_lang$core$Native_Utils.update(
+					old_form,
+					{
+						rate_type: _user$project$Main$stringToRateType(_p0._0)
+					});
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{form: new_form});
+			case 'Time':
+				var old_form = model.form;
+				var new_form = _elm_lang$core$Native_Utils.update(
+					old_form,
+					{
+						time: A2(
+							_elm_lang$core$Result$withDefault,
+							0,
+							_elm_lang$core$String$toInt(_p0._0))
+					});
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{form: new_form});
 			default:
+				var old_form = model.form;
+				var new_form = _elm_lang$core$Native_Utils.update(
+					old_form,
+					{
+						time_type: _user$project$Main$stringToTimeType(_p0._0)
+					});
 				return _elm_lang$core$Native_Utils.update(
 					model,
-					{passwordAgain: _p1._0});
+					{form: new_form});
 		}
 	});
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {name: a, password: b, passwordAgain: c};
-	});
-var _user$project$Main$model = A3(_user$project$Main$Model, '', '', '');
-var _user$project$Main$PasswordAgain = function (a) {
-	return {ctor: 'PasswordAgain', _0: a};
+var _user$project$Main$TimeKind = function (a) {
+	return {ctor: 'TimeKind', _0: a};
 };
-var _user$project$Main$Password = function (a) {
-	return {ctor: 'Password', _0: a};
+var _user$project$Main$Time = function (a) {
+	return {ctor: 'Time', _0: a};
 };
-var _user$project$Main$Name = function (a) {
-	return {ctor: 'Name', _0: a};
+var _user$project$Main$RateKind = function (a) {
+	return {ctor: 'RateKind', _0: a};
+};
+var _user$project$Main$Rate = function (a) {
+	return {ctor: 'Rate', _0: a};
+};
+var _user$project$Main$Deposit = function (a) {
+	return {ctor: 'Deposit', _0: a};
+};
+var _user$project$Main$StartValue = function (a) {
+	return {ctor: 'StartValue', _0: a};
 };
 var _user$project$Main$view = function (model) {
 	return A2(
@@ -8325,63 +8391,33 @@ var _user$project$Main$view = function (model) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Test'),
+					_0: _elm_lang$html$Html$text('Calculadora de juros compostos'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$input,
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
 					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('text'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$placeholder('Name'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Name),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value(model.name),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					},
-					{ctor: '[]'}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$input,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$type_('password'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder('Password'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Password),
-									_1: {ctor: '[]'}
-								}
-							}
-						},
-						{ctor: '[]'}),
-					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$input,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('password'),
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$placeholder('Re-enter Password'),
+									_0: _elm_lang$html$Html_Attributes$placeholder('Valor Inicial'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$PasswordAgain),
-										_1: {ctor: '[]'}
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$StartValue),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value(
+												_elm_lang$core$Basics$toString(model.form.start_value)),
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							},
@@ -8389,52 +8425,100 @@ var _user$project$Main$view = function (model) {
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$select,
+								_elm_lang$html$Html$input,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$name('whatever'),
+									_0: _elm_lang$html$Html_Attributes$type_('number'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Name),
-										_1: {ctor: '[]'}
-									}
-								},
-								A2(
-									_elm_lang$core$List$map,
-									function (val) {
-										return A2(
-											_elm_lang$html$Html$option,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$value(val),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(val),
-												_1: {ctor: '[]'}
-											});
-									},
-									{
-										ctor: '::',
-										_0: 'a',
+										_0: _elm_lang$html$Html_Attributes$placeholder('Aporte mensal'),
 										_1: {
 											ctor: '::',
-											_0: 'b',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Deposit),
 											_1: {
 												ctor: '::',
-												_0: 'c',
+												_0: _elm_lang$html$Html_Attributes$value(
+													_elm_lang$core$Basics$toString(model.form.deposit)),
 												_1: {ctor: '[]'}
 											}
 										}
-									})),
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('number'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$placeholder('Taxa'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Rate),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$value(
+													_elm_lang$core$Basics$toString(model.form.rate)),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								},
+								{ctor: '[]'}),
 							_1: {
 								ctor: '::',
-								_0: _user$project$Main$viewValidation(model),
+								_0: A2(
+									_elm_lang$html$Html$select,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$RateKind),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value(
+												_user$project$Main$rateTypetoString(model.form.rate_type)),
+											_1: {ctor: '[]'}
+										}
+									},
+									A2(
+										_elm_lang$core$List$map,
+										function (val) {
+											return A2(
+												_elm_lang$html$Html$option,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$value(val),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(val),
+													_1: {ctor: '[]'}
+												});
+										},
+										{
+											ctor: '::',
+											_0: 'Mensal',
+											_1: {
+												ctor: '::',
+												_0: 'Anual',
+												_1: {ctor: '[]'}
+											}
+										})),
 								_1: {ctor: '[]'}
 							}
-						}
-					}
+						}),
+					_1: {ctor: '[]'}
 				}
 			}
 		});

@@ -13,10 +13,10 @@ type TimeType = Months | Years
 
 rateTypetoString : RateType -> String
 rateTypetoString t =
-  if t == Monthly then "Mensal" else "Anual"
+  if t == Monthly then "Mês" else "Ano"
 stringToRateType : String -> RateType
 stringToRateType t =
-  if t == "Mensal" then Monthly else Yearly
+  if t == "Mês" then Monthly else Yearly
 
 timeTypetoString : TimeType -> String
 timeTypetoString t =
@@ -107,25 +107,70 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-  Html.form []
-    [ h1 [] [ text "Calculadora de juros compostos" ]
-    , div []
-      [ input [ type_ "number"
-              , placeholder "Valor Inicial"
-              , onInput StartValue
-              , value (toString model.form.start_value)] []
-      , input [ type_ "number"
-              , placeholder "Aporte mensal"
-              , onInput Deposit
-              , value (toString model.form.deposit)] []
+  main_ [] 
+  [ Html.node "link" [ rel "stylesheet", href "calculator.css" ] []
+  , h1 [] [ text "Calculadora de juros compostos" ]
+  , Html.form []
+    [ div [ class "input-wrapper"]
+      [ label [ for "start_value"] [text "Valor Inicial"]
+      , input 
+        [ type_ "number"
+        , name "start_value"
+        , onInput StartValue
+        , value (toString model.form.start_value)]
+        []
       ]
-    , div []
-      [ input [ type_ "number"
-              , placeholder "Taxa"
-              , onInput Rate
-              , value (toString model.form.rate)] []
-      , select [ onInput RateKind
-               , value (rateTypetoString model.form.rate_type)]
-               (List.map (\val -> option [value val] [text val]) ["Mensal","Anual"])
+    , div [ class "input-wrapper"]
+      [ label [ for "deposit"] [text "Aporte mensal"]
+      , input 
+        [ type_ "number"
+        , name "deposit"
+        , onInput Deposit
+        , value (toString model.form.deposit)] 
+        []
       ]
+    , div [ class "input-wrapper"]
+      [ label [ for "rate"] [text "Taxa(%)"]
+      , input 
+        [ type_ "number"
+        , name "rate"
+        , onInput Rate
+        , value (toString model.form.rate)] 
+        []
+      ]
+    , div [ class "input-wrapper"]
+      [ label [ for "rate_type"] [text "Por"]
+      , select 
+        [ name "rate_type"
+        , onInput RateKind
+        , value (rateTypetoString model.form.rate_type)] 
+        (List.map (\val -> option [value val, selected (model.form.rate_type == stringToRateType val)] [text val]) ["Mês","Ano"])
+      ]
+    , div [ class "input-wrapper"]
+      [ label [ for "time"] [text "Tempo aplicado"]
+      , input 
+        [ type_ "number"
+        , name "time"
+        , onInput Time
+        , value (toString model.form.time)] 
+        []
+      ]
+    , div [ class "input-wrapper"]
+      [ label [ for "time_type"] [text "Em"]
+      , select 
+        [ name "time_type"
+        , onInput TimeKind
+        , value (timeTypetoString model.form.time_type)] 
+        (List.map (\val -> option [value val, selected (model.form.time_type == stringToTimeType val)] [text val]) ["Meses","Anos"])
+      ]
+    , button [type_ "button"] [text "Calcular"]
     ]
+  , div [] 
+      [ text (toString (calculate model.form.start_value (model.form.rate / 100.0) 12.0 (toFloat model.form.time)))
+      ]
+  ]
+
+calculate : Float -> Float -> Float -> Float -> Float
+calculate p r n t =
+  p * (1+r/n)^(n * t)
+
