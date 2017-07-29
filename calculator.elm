@@ -7,39 +7,100 @@ main =
   Html.beginnerProgram { model = model, view = view, update = update }
 
 
--- MODEL
+-- MODELInt
+type RateType = Monthly | Yearly
+type TimeType = Months | Years
+
+rateTypetoString : RateType -> String
+rateTypetoString t =
+  if t == Monthly then "Mensal" else "Anual"
+stringToRateType : String -> RateType
+stringToRateType t =
+  if t == "Mensal" then Monthly else Yearly
+
+timeTypetoString : TimeType -> String
+timeTypetoString t =
+  if t == Months then "Meses" else "Anos"
+stringToTimeType : String -> TimeType
+stringToTimeType t =
+  if t == "Meses" then Months else Years
 
 type alias Model =
-  { name : String
-  , password : String
-  , passwordAgain : String
+  { form :
+    { start_value : Float
+    , deposit : Float
+    , rate : Float
+    , rate_type : RateType
+    , time : Int
+    , time_type : TimeType
+    }
+  , results: {}
   }
 
 
 model : Model
 model =
-  Model "" "" ""
+  Model
+    { start_value = 0.0
+    , deposit = 0.0
+    , rate = 0.0
+    , rate_type = Yearly
+    , time = 0
+    , time_type = Years
+    }
+    {}
 
 
 -- UPDATE
 
 type Msg
-    = Name String
-    | Password String
-    | PasswordAgain String
+    = StartValue String
+    | Deposit String
+    | Rate String
+    | RateKind String
+    | Time String
+    | TimeKind String
 
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Name name ->
-      { model | name = name }
-
-    Password password ->
-      { model | password = password }
-
-    PasswordAgain password ->
-      { model | passwordAgain = password }
+    StartValue start_value ->
+      let
+        old_form = model.form
+        new_form = { old_form | start_value = Result.withDefault 0 (String.toFloat start_value) }
+      in
+        { model | form = new_form }
+    Deposit deposit ->
+      let
+        old_form = model.form
+        new_form = { old_form | deposit = Result.withDefault 0 (String.toFloat deposit) }
+      in
+        { model | form = new_form }
+    Rate rate ->
+      let
+        old_form = model.form
+        new_form = { old_form | rate = Result.withDefault 0 (String.toFloat rate) }
+      in
+        { model | form = new_form }
+    RateKind rate_type ->
+      let
+        old_form = model.form
+        new_form = { old_form | rate_type = stringToRateType rate_type }
+      in
+        { model | form = new_form }
+    Time time ->
+      let
+        old_form = model.form
+        new_form = { old_form | time = Result.withDefault 0 (String.toInt time) }
+      in
+        { model | form = new_form }
+    TimeKind time_type ->
+      let
+        old_form = model.form
+        new_form = { old_form | time_type = stringToTimeType time_type }
+      in
+        { model | form = new_form }
 
 
 -- VIEW
@@ -47,9 +108,24 @@ update msg model =
 view : Model -> Html Msg
 view model =
   Html.form []
-    [ h1 [] [ text "Test" ]
-    , input [ type_ "text", placeholder "Name", onInput Name, value model.name] []
-    , input [ type_ "password", placeholder "Password", onInput Password ] []
-    , input [ type_ "password", placeholder "Re-enter Password", onInput PasswordAgain ] []
-    , select [ name "whatever", onInput Name ] (List.map (\val -> option [value val] [text val]) ["a","b","c"])
+    [ h1 [] [ text "Calculadora de juros compostos" ]
+    , div []
+      [ input [ type_ "number"
+              , placeholder "Valor Inicial"
+              , onInput StartValue
+              , value (toString model.form.start_value)] []
+      , input [ type_ "number"
+              , placeholder "Aporte mensal"
+              , onInput Deposit
+              , value (toString model.form.deposit)] []
+      ]
+    , div []
+      [ input [ type_ "number"
+              , placeholder "Taxa"
+              , onInput Rate
+              , value (toString model.form.rate)] []
+      , select [ onInput RateKind
+               , value (rateTypetoString model.form.rate_type)]
+               (List.map (\val -> option [value val] [text val]) ["Mensal","Anual"])
+      ]
     ]
