@@ -1,6 +1,8 @@
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (..)
+import Svg
+import Svg.Attributes
 
 
 main =
@@ -168,7 +170,14 @@ view model =
   , div [] 
       [ text (toString (calculate model.form.start_value (model.form.rate / 100.0) 12.0 (toFloat model.form.time)))
       ]
+  , graph model
   ]
+
+graph : Model -> Html msg
+graph model =
+  Svg.svg
+      [ Svg.Attributes.width "240", Svg.Attributes.height "120", Svg.Attributes.viewBox "0 0 240 120" ]
+      [ Svg.polyline [ Svg.Attributes.fill "none", Svg.Attributes.stroke "#f80", Svg.Attributes.points "0,120 20,0 40,60 60,30 80,60" ] []]
 
 calculate : Float -> Float -> Float -> Float -> Float
 calculate p r n t =
