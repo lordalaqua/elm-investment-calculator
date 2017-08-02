@@ -175,7 +175,7 @@ view model =
                 , input
                     [ type_ "number"
                     , name "start_value"
-                    , step "100"
+                    , step "1000"
                     , Html.Attributes.min "0"
                     , onInput StartValue
                     , value (toString model.form.start_value)
@@ -222,6 +222,7 @@ view model =
                     , name "time"
                     , Html.Attributes.value "1"
                     , Html.Attributes.min "1"
+                    , Html.Attributes.max "1000"
                     , onInput Time
                     , value (toString model.form.time)
                     ]
@@ -252,10 +253,10 @@ graph model =
       else
         model.form.rate / 100
     time =
-      toFloat (if model.form.time_type == Years then
+      (Basics.max 1 (Basics.min (1000*12) (toFloat (if model.form.time_type == Years then
         model.form.time * 12
       else
-        model.form.time)
+        model.form.time))))
     svgWidth =
       900
     svgHeight =
@@ -265,7 +266,7 @@ graph model =
     appliedValue =
       (applied model.form.start_value model.form.deposit time)
     valuesWidth =
-      time + 1
+      time
     valuesHeight =
       1.2 * finalValue
     valuesX =
@@ -318,24 +319,26 @@ graph model =
           )
         ))
       )
+    formatResults v =
+      if time < 12000 then formatFloat v else "---"
   in
     div [ class "results-wrapper"]
     [ div [ class "results" ]
       [ div [ class "results-item final" ]
         [ div [ class "results-title" ] [text "Valor Final: "]
-        , div [ class "results-value" ] [text (formatFloat finalValue)]
+        , div [ class "results-value" ] [text (formatResults finalValue)]
         ]
       , div [ class "results-item applied" ]
         [ div [ class "results-title" ] [text "Montante aplicado: "]
-        , div [ class "results-value" ] [ text (formatFloat appliedValue) ]
+        , div [ class "results-value" ] [ text (formatResults appliedValue) ]
         ]
       , div [ class "results-item interest" ]
         [ div [ class "results-title" ] [text "Rendimento (Juros): "]
-        , div [ class "results-value" ] [ text (formatFloat (finalValue - appliedValue)) ]
+        , div [ class "results-value" ] [ text (formatResults (finalValue - appliedValue)) ]
         ]
       , div [ class "results-item" ]
         [ div [ class "results-title" ] [text "Rendimento mensal médio: "]
-        , div [ class "results-value" ] [ text (if time > 0 then (formatFloat ((finalValue - appliedValue)/time)) else "0,00") ]
+        , div [ class "results-value" ] [ text (formatResults ((finalValue - appliedValue)/time)) ]
         ]
 
       ]
@@ -369,28 +372,32 @@ graph model =
 
 formatFloat: Float -> String
 formatFloat f =
+  if f > 1000000000000000 then "Mais de 1.000.000.000.000.000" else
   if f == 0 then "0,00" else
-  let original = (toString (floor (f*100))) in
-    (Tuple.second (String.foldr
-      (\c -> \res ->
-        let
-          count =
-            (Tuple.first res)
-          str =
-            (Tuple.second res)
-          char =
-            (String.fromChar c)
-        in
-          (count + 1
-          , if (count /= 0 && count % 3 == 0)
-            then char ++ "." ++ str
-            else char ++ str
-          )
-      )
-      (0, "")
-      (String.dropRight 2 original)
-    ))
-    ++ "," ++ (String.right 2 original)
+  if f < 1 then
+    "0," ++ (toString (floor (f*100)))
+  else
+    let original = (toString (floor (f*100))) in
+      (Tuple.second (String.foldr
+        (\c -> \res ->
+          let
+            count =
+              (Tuple.first res)
+            str =
+              (Tuple.second res)
+            char =
+              (String.fromChar c)
+          in
+            (count + 1
+            , if (count /= 0 && count % 3 == 0)
+              then char ++ "." ++ str
+              else char ++ str
+            )
+        )
+        (0, "")
+        (String.dropRight 2 original)
+      ))
+      ++ "," ++ (String.right 2 original)
 
 
 graphLine : (Int -> (Float, Float)) -> Int -> (( Float, Float ) -> ( Float, Float )) -> String -> Svg.Svg msg
