@@ -24,6 +24,7 @@ form {
 
 input, select {
     border: 1px solid #999;
+    background-color: #f6f6f6;
     border-radius: 2px;
     padding: 5px;
     margin-bottom: 10px;
@@ -52,4 +53,67 @@ button {
     padding: 0 5px;
     display: flex;
     flex-direction: column;
+}
+
+.graph-wrapper {
+    padding: 0;
+}
+
+.graph {
+    width: 100%;
+    height: auto;
+    margin-bottom: 300px;
+}
+
+.results {
+    max-width: 60em;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.results-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    flex: 1 1 auto;
+    border-radius: 3px;
+    margin: 10px;
+    overflow: hidden;
+}
+
+.results-title {
+    padding: 10px;
+    background-color: #ccc;
+    border-bottom: 2px solid #666;
+}
+
+.results-value {
+    padding: 10px;
+    background-color: #eee;
+}
+
+.final {
+    stroke: #f80;
+}
+
+.final > .results-title {
+    border-bottom: 2px solid #f80;
+}
+
+.applied {
+    stroke: #08f;
+}
+
+.applied > .results-title {
+    border-bottom: 2px solid #08f;
+}
+
+.interest {
+    stroke: #0f8;
+}
+
+.interest > .results-title {
+    border-bottom: 2px solid #0f8;
 }

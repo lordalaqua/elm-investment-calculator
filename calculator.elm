@@ -77,7 +77,7 @@ model =
         , deposit = 0.0
         , rate = 0.0
         , rate_type = Yearly
-        , time = 0
+        , time = 1
         , time_type = Years
         }
         {}
@@ -175,6 +175,8 @@ view model =
                 , input
                     [ type_ "number"
                     , name "start_value"
+                    , step "100"
+                    , Html.Attributes.min "0"
                     , onInput StartValue
                     , value (toString model.form.start_value)
                     ]
@@ -185,6 +187,8 @@ view model =
                 , input
                     [ type_ "number"
                     , name "deposit"
+                    , step "100"
+                    , Html.Attributes.min "0"
                     , onInput Deposit
                     , value (toString model.form.deposit)
                     ]
@@ -195,6 +199,8 @@ view model =
                 , input
                     [ type_ "number"
                     , name "rate"
+                    , step "0.50"
+                    , Html.Attributes.min "0"
                     , onInput Rate
                     , value (toString model.form.rate)
                     ]
@@ -214,6 +220,8 @@ view model =
                 , input
                     [ type_ "number"
                     , name "time"
+                    , Html.Attributes.value "1"
+                    , Html.Attributes.min "1"
                     , onInput Time
                     , value (toString model.form.time)
                     ]
@@ -228,68 +236,193 @@ view model =
                     ]
                     (List.map (\val -> option [ value val, selected (model.form.time_type == stringToTimeType val) ] [ text val ]) [ "Meses", "Anos" ])
                 ]
-            , button [ type_ "button" ] [ text "Calcular" ]
-            ]
-        , div []
-            [ text (toString (finalSum model.form.start_value model.form.deposit (model.form.rate / 1200.0) (toFloat model.form.time)))
             ]
         , graph model
         ]
 
-convertToRange : Float -> Float -> Float -> Float
-convertToRange value r1 r2 = (value/r1) * r2
+convertToRange : Float -> Float -> Float -> Float -> Float -> Float
+convertToRange value r1 s1 r2 s2 = (value-s1)/(r1-s1) * (r2-s2) + s2
 
 graph : Model -> Html msg
 graph model =
   let
-    graphWidth =
-      (Basics.max (toFloat model.form.time) 1)
-    finalValue = 
-      (finalSum model.form.start_value model.form.deposit (model.form.rate / 1200.0) (toFloat model.form.time))
-    graphHeight = 
-      1.5 * finalValue
+    rate =
+      if model.form.rate_type == Yearly then
+        (1 + model.form.rate/100) ^ (1 / 12) - 1
+      else
+        model.form.rate / 100
+    time =
+      toFloat (if model.form.time_type == Years then
+        model.form.time * 12
+      else
+        model.form.time)
     svgWidth =
       900
-    svgHeight = 
-      600
+    svgHeight =
+      svgWidth // 3
+    finalValue =
+      (total model.form.start_value model.form.deposit rate time)
+    appliedValue =
+      (applied model.form.start_value model.form.deposit time)
+    valuesWidth =
+      time + 1
+    valuesHeight =
+      1.2 * finalValue
+    valuesX =
+      0
+    valuesY =
+      0
+    graphPadX =
+      20
+    graphPadY =
+      10
+    graphWidth =
+      svgWidth - graphPadX
+    rectWidth =
+      svgWidth - (2 * graphPadX)
+    graphHeight =
+      toFloat svgHeight - graphPadY
+    rectHeight =
+      svgHeight - (2 * graphPadY)
+    graphX =
+      graphPadX
+    graphY =
+      graphPadY
     range =
-      model.form.time
-    start_value = 
+      floor valuesWidth
+    start_value =
       model.form.start_value
-    function n =
-      (iteration n model.form.deposit (model.form.rate/1200.0) )
+    plot1 n =
+       ((toFloat n), (total model.form.start_value model.form.deposit rate (toFloat n)))
+    plot2 n =
+       ((toFloat n), (applied model.form.start_value model.form.deposit (toFloat n)))
+    plot3 n =
+       ((toFloat n), (interest model.form.start_value model.form.deposit rate (toFloat n)))
+    graphPlotPoint p =
+      ( (convertToRange
+          (Tuple.first p)
+          valuesWidth
+          (2*valuesX)
+          graphWidth
+          graphX
+        )
+      , (toFloat svgHeight)
+        -
+        (Basics.max graphY (Basics.min graphHeight
+          (convertToRange
+            (Tuple.second p)
+            valuesHeight
+            valuesY
+            graphHeight
+            graphY
+          )
+        ))
+      )
   in
-    Svg.svg
-      [ Svg.Attributes.width (toString svgWidth)
-      , Svg.Attributes.height (toString svgHeight)
-      , Svg.Attributes.viewBox ("0 0 " ++ toString svgWidth ++ " " ++ toString svgHeight) 
+    div [ class "results-wrapper"]
+    [ div [ class "results" ]
+      [ div [ class "results-item final" ]
+        [ div [ class "results-title" ] [text "Valor Final: "]
+        , div [ class "results-value" ] [text (formatFloat finalValue)]
+        ]
+      , div [ class "results-item applied" ]
+        [ div [ class "results-title" ] [text "Montante aplicado: "]
+        , div [ class "results-value" ] [ text (formatFloat appliedValue) ]
+        ]
+      , div [ class "results-item interest" ]
+        [ div [ class "results-title" ] [text "Rendimento (Juros): "]
+        , div [ class "results-value" ] [ text (formatFloat (finalValue - appliedValue)) ]
+        ]
+      , div [ class "results-item" ]
+        [ div [ class "results-title" ] [text "Rendimento mensal médio: "]
+        , div [ class "results-value" ] [ text (if time > 0 then (formatFloat ((finalValue - appliedValue)/time)) else "0,00") ]
+        ]
+
       ]
-      [ Svg.polyline
-        [ Svg.Attributes.fill "none"
-        , Svg.Attributes.stroke "#f80"
-        , Svg.Attributes.points
-          (String.join " "
-            (List.map 
-              (\n -> 
-                (toString (convertToRange (toFloat (Tuple.first n)) graphWidth svgWidth))
-                ++ "," ++ 
-                (toString ((toFloat svgHeight) - (convertToRange (Tuple.second n) graphHeight svgHeight)))
-              )
-              (List.scanl 
-                (\el -> \res -> ( el, function (Tuple.second res))) 
-                (0, start_value) 
-                (List.range 1 range)
+    , div [ class "graph-wrapper"]
+      [ Svg.svg
+          [ Svg.Attributes.class "graph"
+          , Svg.Attributes.width (toString svgWidth)
+          , Svg.Attributes.height (toString svgHeight)
+          , Svg.Attributes.viewBox ("0 0 " ++ toString svgWidth ++ " " ++ toString svgHeight)
+          ]
+          [ Svg.text_
+            [ Svg.Attributes.x (toString (graphX+graphWidth))
+            , Svg.Attributes.y (toString 50)
+            ]
+            [Svg.text "0"]
+          , Svg.rect
+            [ Svg.Attributes.fill "#fefefe"
+            , Svg.Attributes.stroke "#ccc"
+            , Svg.Attributes.x (toString graphX)
+            , Svg.Attributes.y (toString graphY)
+            , Svg.Attributes.width (toString rectWidth)
+            , Svg.Attributes.height (toString rectHeight)
+            ]
+            []
+          , (graphLine plot1 range graphPlotPoint "final")
+          , (graphLine plot2 range graphPlotPoint "applied")
+          , (graphLine plot3 range graphPlotPoint "interest")
+          ]
+      ]
+    ]
+
+formatFloat: Float -> String
+formatFloat f =
+  if f == 0 then "0,00" else
+  let original = (toString (floor (f*100))) in
+    (Tuple.second (String.foldr
+      (\c -> \res ->
+        let
+          count =
+            (Tuple.first res)
+          str =
+            (Tuple.second res)
+          char =
+            (String.fromChar c)
+        in
+          (count + 1
+          , if (count /= 0 && count % 3 == 0)
+            then char ++ "." ++ str
+            else char ++ str
+          )
+      )
+      (0, "")
+      (String.dropRight 2 original)
+    ))
+    ++ "," ++ (String.right 2 original)
+
+
+graphLine : (Int -> (Float, Float)) -> Int -> (( Float, Float ) -> ( Float, Float )) -> String -> Svg.Svg msg
+graphLine function range plotPoint color =
+  Svg.polyline
+          [ Svg.Attributes.fill "none"
+          , Svg.Attributes.class color
+          , Svg.Attributes.strokeWidth "2"
+          , Svg.Attributes.points
+            (String.join " "
+              (List.map
+                (\p -> (toString (Tuple.first p)) ++ "," ++ (toString (Tuple.second p)))
+                (List.map
+                  plotPoint
+                  (List.map function (List.range 0 range))
+                )
               )
             )
-          )
-        ]
-        []
-      ]
+          ]
+          []
 
+applied : Float -> Float -> Float -> Float
+applied p d t =
+  p + d * t
 
-finalSum : Float -> Float -> Float -> Float -> Float
-finalSum p d r t =
-  if r == 0 then p + d * t else (p + d/r) * (1.0 + r) ^ t - (d/r)
+total : Float -> Float -> Float -> Float -> Float
+total p d r t =
+  if r == 0 then (applied p d t) else (p + d/r) * (1.0 + r) ^ t - (d/r)
+
+interest : Float -> Float -> Float -> Float -> Float
+interest p d r t =
+  (total p d r t) - (applied p d t)
 
 iteration : Float -> Float -> Float -> Float
 iteration amount deposit rate =
