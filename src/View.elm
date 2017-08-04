@@ -13,7 +13,7 @@ import Graph exposing (graph)
 view : Model.Model -> Html.Html Update.Msg
 view model =
     Html.main_ []
-        [ Html.node "link" [ Attr.rel "stylesheet", Attr.href "calculator.css" ] []
+        [ Html.node "link" [ Attr.rel "stylesheet", Attr.href "calculator-nc.css" ] []
         , calculatorForm model
         , graph model
         ]
