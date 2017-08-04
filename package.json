@@ -5,8 +5,14 @@
     "main": "calculator.js",
     "scripts": {
         "make": "elm-make calculator.elm --output=calculator.js",
-        "uglify": "uglifyjs calculator.js -m -c sequences,dead_code,conditionals,booleans,unused,if_return,join_vars,drop_console -o calculator.min.js"
+        "uglify": "uglifyjs calculator.js -m -c sequences,dead_code,conditionals,booleans,unused,if_return,join_vars,drop_console -o calculator.min.js",
+        "postcss": "postcss calculator.css -o calculator.min.css"
     },
     "author": "",
-    "license": "MIT"
+    "license": "MIT",
+    "devDependencies": {
+        "autoprefixer": "^7.1.2",
+        "postcss": "^6.0.8",
+        "postcss-cli": "^4.1.0"
+    }
 }

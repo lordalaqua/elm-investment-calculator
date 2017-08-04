@@ -1,6 +1,3 @@
-body {
-    font-family: Courier Courier New, Courier, monospace;
-}
 html {
     box-sizing: border-box;
 }
@@ -8,13 +5,7 @@ html {
     box-sizing: inherit;
 }
 
-main {
-    margin: auto;
-    max-width: 60em;
-    padding: 0 5px;
-}
-
-form {
+.calc-form {
     display: flex;
     align-items: stretch;
     flex-wrap: wrap;
@@ -22,7 +13,7 @@ form {
     max-width: 40em;
 }
 
-input, select {
+.calc-form input, .calc-form select {
     border: 1px solid #999;
     background-color: #f6f6f6;
     border-radius: 2px;
@@ -34,20 +25,6 @@ input, select {
     align-items: center;
 }
 
-button {
-    flex: 0 1 100%;
-    margin: 0 5px;
-    line-height: 2.5;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: linear-gradient(170deg, #08f, #0df);
-    border-radius: 2px;
-    color: white;
-    font-weight: bold;
-    font-family: inherit;
-}
-
 .input-wrapper {
     flex: 0 1 50%;
     padding: 0 5px;
@@ -57,6 +34,8 @@ button {
 
 .graph-wrapper {
     padding: 0;
+    margin: auto;
+    max-width: 60em;
 }
 
 .graph {

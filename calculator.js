@@ -3746,6 +3746,203 @@ var _elm_lang$core$Result$fromMaybe = F2(
 		}
 	});
 
+var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
+var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
+var _elm_lang$core$Task$spawnCmd = F2(
+	function (router, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_Scheduler.spawn(
+			A2(
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Platform$sendToApp(router),
+				_p1._0));
+	});
+var _elm_lang$core$Task$fail = _elm_lang$core$Native_Scheduler.fail;
+var _elm_lang$core$Task$mapError = F2(
+	function (convert, task) {
+		return A2(
+			_elm_lang$core$Task$onError,
+			function (_p2) {
+				return _elm_lang$core$Task$fail(
+					convert(_p2));
+			},
+			task);
+	});
+var _elm_lang$core$Task$succeed = _elm_lang$core$Native_Scheduler.succeed;
+var _elm_lang$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return _elm_lang$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return _elm_lang$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map3 = F4(
+	function (func, taskA, taskB, taskC) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return _elm_lang$core$Task$succeed(
+									A3(func, a, b, c));
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map4 = F5(
+	function (func, taskA, taskB, taskC, taskD) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return _elm_lang$core$Task$succeed(
+											A4(func, a, b, c, d));
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map5 = F6(
+	function (func, taskA, taskB, taskC, taskD, taskE) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return A2(
+											_elm_lang$core$Task$andThen,
+											function (e) {
+												return _elm_lang$core$Task$succeed(
+													A5(func, a, b, c, d, e));
+											},
+											taskE);
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$sequence = function (tasks) {
+	var _p3 = tasks;
+	if (_p3.ctor === '[]') {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '[]'});
+	} else {
+		return A3(
+			_elm_lang$core$Task$map2,
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			_p3._0,
+			_elm_lang$core$Task$sequence(_p3._1));
+	}
+};
+var _elm_lang$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			_elm_lang$core$Task$map,
+			function (_p4) {
+				return {ctor: '_Tuple0'};
+			},
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Task$spawnCmd(router),
+					commands)));
+	});
+var _elm_lang$core$Task$init = _elm_lang$core$Task$succeed(
+	{ctor: '_Tuple0'});
+var _elm_lang$core$Task$onSelfMsg = F3(
+	function (_p7, _p6, _p5) {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '_Tuple0'});
+	});
+var _elm_lang$core$Task$command = _elm_lang$core$Native_Platform.leaf('Task');
+var _elm_lang$core$Task$Perform = function (a) {
+	return {ctor: 'Perform', _0: a};
+};
+var _elm_lang$core$Task$perform = F2(
+	function (toMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(_elm_lang$core$Task$map, toMessage, task)));
+	});
+var _elm_lang$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(
+					_elm_lang$core$Task$onError,
+					function (_p8) {
+						return _elm_lang$core$Task$succeed(
+							resultToMessage(
+								_elm_lang$core$Result$Err(_p8)));
+					},
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (_p9) {
+							return _elm_lang$core$Task$succeed(
+								resultToMessage(
+									_elm_lang$core$Result$Ok(_p9)));
+						},
+						task))));
+	});
+var _elm_lang$core$Task$cmdMap = F2(
+	function (tagger, _p10) {
+		var _p11 = _p10;
+		return _elm_lang$core$Task$Perform(
+			A2(_elm_lang$core$Task$map, tagger, _p11._0));
+	});
+_elm_lang$core$Native_Platform.effectManagers['Task'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Task$init, onEffects: _elm_lang$core$Task$onEffects, onSelfMsg: _elm_lang$core$Task$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Task$cmdMap};
+
 //import Native.Utils //
 
 var _elm_lang$core$Native_Debug = function() {
@@ -5077,6 +5274,221 @@ var _elm_lang$core$Dict$diff = F2(
 			t2);
 	});
 
+//import Native.Scheduler //
+
+var _elm_lang$core$Native_Time = function() {
+
+var now = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+{
+	callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
+});
+
+function setInterval_(interval, task)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var id = setInterval(function() {
+			_elm_lang$core$Native_Scheduler.rawSpawn(task);
+		}, interval);
+
+		return function() { clearInterval(id); };
+	});
+}
+
+return {
+	now: now,
+	setInterval_: F2(setInterval_)
+};
+
+}();
+var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
+var _elm_lang$core$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		var _p0 = intervals;
+		if (_p0.ctor === '[]') {
+			return _elm_lang$core$Task$succeed(processes);
+		} else {
+			var _p1 = _p0._0;
+			var spawnRest = function (id) {
+				return A3(
+					_elm_lang$core$Time$spawnHelp,
+					router,
+					_p0._1,
+					A3(_elm_lang$core$Dict$insert, _p1, id, processes));
+			};
+			var spawnTimer = _elm_lang$core$Native_Scheduler.spawn(
+				A2(
+					_elm_lang$core$Time$setInterval,
+					_p1,
+					A2(_elm_lang$core$Platform$sendToSelf, router, _p1)));
+			return A2(_elm_lang$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var _elm_lang$core$Time$addMySub = F2(
+	function (_p2, state) {
+		var _p3 = _p2;
+		var _p6 = _p3._1;
+		var _p5 = _p3._0;
+		var _p4 = A2(_elm_lang$core$Dict$get, _p5, state);
+		if (_p4.ctor === 'Nothing') {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{
+					ctor: '::',
+					_0: _p6,
+					_1: {ctor: '[]'}
+				},
+				state);
+		} else {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{ctor: '::', _0: _p6, _1: _p4._0},
+				state);
+		}
+	});
+var _elm_lang$core$Time$inMilliseconds = function (t) {
+	return t;
+};
+var _elm_lang$core$Time$millisecond = 1;
+var _elm_lang$core$Time$second = 1000 * _elm_lang$core$Time$millisecond;
+var _elm_lang$core$Time$minute = 60 * _elm_lang$core$Time$second;
+var _elm_lang$core$Time$hour = 60 * _elm_lang$core$Time$minute;
+var _elm_lang$core$Time$inHours = function (t) {
+	return t / _elm_lang$core$Time$hour;
+};
+var _elm_lang$core$Time$inMinutes = function (t) {
+	return t / _elm_lang$core$Time$minute;
+};
+var _elm_lang$core$Time$inSeconds = function (t) {
+	return t / _elm_lang$core$Time$second;
+};
+var _elm_lang$core$Time$now = _elm_lang$core$Native_Time.now;
+var _elm_lang$core$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _p7 = A2(_elm_lang$core$Dict$get, interval, state.taggers);
+		if (_p7.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var tellTaggers = function (time) {
+				return _elm_lang$core$Task$sequence(
+					A2(
+						_elm_lang$core$List$map,
+						function (tagger) {
+							return A2(
+								_elm_lang$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						_p7._0));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p8) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				A2(_elm_lang$core$Task$andThen, tellTaggers, _elm_lang$core$Time$now));
+		}
+	});
+var _elm_lang$core$Time$subscription = _elm_lang$core$Native_Platform.leaf('Time');
+var _elm_lang$core$Time$State = F2(
+	function (a, b) {
+		return {taggers: a, processes: b};
+	});
+var _elm_lang$core$Time$init = _elm_lang$core$Task$succeed(
+	A2(_elm_lang$core$Time$State, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty));
+var _elm_lang$core$Time$onEffects = F3(
+	function (router, subs, _p9) {
+		var _p10 = _p9;
+		var rightStep = F3(
+			function (_p12, id, _p11) {
+				var _p13 = _p11;
+				return {
+					ctor: '_Tuple3',
+					_0: _p13._0,
+					_1: _p13._1,
+					_2: A2(
+						_elm_lang$core$Task$andThen,
+						function (_p14) {
+							return _p13._2;
+						},
+						_elm_lang$core$Native_Scheduler.kill(id))
+				};
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _p15) {
+				var _p16 = _p15;
+				return {
+					ctor: '_Tuple3',
+					_0: _p16._0,
+					_1: A3(_elm_lang$core$Dict$insert, interval, id, _p16._1),
+					_2: _p16._2
+				};
+			});
+		var leftStep = F3(
+			function (interval, taggers, _p17) {
+				var _p18 = _p17;
+				return {
+					ctor: '_Tuple3',
+					_0: {ctor: '::', _0: interval, _1: _p18._0},
+					_1: _p18._1,
+					_2: _p18._2
+				};
+			});
+		var newTaggers = A3(_elm_lang$core$List$foldl, _elm_lang$core$Time$addMySub, _elm_lang$core$Dict$empty, subs);
+		var _p19 = A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			_p10.processes,
+			{
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _elm_lang$core$Dict$empty,
+				_2: _elm_lang$core$Task$succeed(
+					{ctor: '_Tuple0'})
+			});
+		var spawnList = _p19._0;
+		var existingDict = _p19._1;
+		var killTask = _p19._2;
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (newProcesses) {
+				return _elm_lang$core$Task$succeed(
+					A2(_elm_lang$core$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (_p20) {
+					return A3(_elm_lang$core$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var _elm_lang$core$Time$Every = F2(
+	function (a, b) {
+		return {ctor: 'Every', _0: a, _1: b};
+	});
+var _elm_lang$core$Time$every = F2(
+	function (interval, tagger) {
+		return _elm_lang$core$Time$subscription(
+			A2(_elm_lang$core$Time$Every, interval, tagger));
+	});
+var _elm_lang$core$Time$subMap = F2(
+	function (f, _p21) {
+		var _p22 = _p21;
+		return A2(
+			_elm_lang$core$Time$Every,
+			_p22._0,
+			function (_p23) {
+				return f(
+					_p22._1(_p23));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
+
 var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
 var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
 
@@ -5730,6 +6142,10 @@ var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
 
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
 var _elm_lang$core$Tuple$mapSecond = F2(
 	function (func, _p0) {
 		var _p1 = _p0;
@@ -5756,6 +6172,192 @@ var _elm_lang$core$Tuple$first = function (_p6) {
 	var _p7 = _p6;
 	return _p7._0;
 };
+
+var _elm_lang$dom$Native_Dom = function() {
+
+var fakeNode = {
+	addEventListener: function() {},
+	removeEventListener: function() {}
+};
+
+var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
+var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+var rAF = typeof requestAnimationFrame !== 'undefined'
+	? requestAnimationFrame
+	: function(callback) { callback(); };
+
+function withNode(id, doStuff)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		rAF(function()
+		{
+			var node = document.getElementById(id);
+			if (node === null)
+			{
+				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
+				return;
+			}
+			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
+		});
+	});
+}
+
+
+// FOCUS
+
+function focus(id)
+{
+	return withNode(id, function(node) {
+		node.focus();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function blur(id)
+{
+	return withNode(id, function(node) {
+		node.blur();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SCROLLING
+
+function getScrollTop(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollTop;
+	});
+}
+
+function setScrollTop(id, desiredScrollTop)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = desiredScrollTop;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toBottom(id)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = node.scrollHeight;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function getScrollLeft(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollLeft;
+	});
+}
+
+function setScrollLeft(id, desiredScrollLeft)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = desiredScrollLeft;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toRight(id)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = node.scrollWidth;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SIZE
+
+function width(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollWidth;
+			case 'VisibleContent':
+				return node.clientWidth;
+			case 'VisibleContentWithBorders':
+				return node.offsetWidth;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.right - rect.left;
+		}
+	});
+}
+
+function height(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollHeight;
+			case 'VisibleContent':
+				return node.clientHeight;
+			case 'VisibleContentWithBorders':
+				return node.offsetHeight;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.bottom - rect.top;
+		}
+	});
+}
+
+return {
+	onDocument: F3(onDocument),
+	onWindow: F3(onWindow),
+
+	focus: focus,
+	blur: blur,
+
+	getScrollTop: getScrollTop,
+	setScrollTop: F2(setScrollTop),
+	getScrollLeft: getScrollLeft,
+	setScrollLeft: F2(setScrollLeft),
+	toBottom: toBottom,
+	toRight: toRight,
+
+	height: F2(height),
+	width: F2(width)
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
 
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
@@ -8601,47 +9203,241 @@ var _elm_lang$svg$Svg_Attributes$accumulate = _elm_lang$virtual_dom$VirtualDom$a
 var _elm_lang$svg$Svg_Attributes$accelerate = _elm_lang$virtual_dom$VirtualDom$attribute('accelerate');
 var _elm_lang$svg$Svg_Attributes$accentHeight = _elm_lang$virtual_dom$VirtualDom$attribute('accent-height');
 
-var _user$project$Main$calculate = F4(
-	function (p, r, n, t) {
-		return p * Math.pow(1 + (r / n), n * t);
+var _elm_lang$window$Native_Window = function()
+{
+
+var size = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)	{
+	callback(_elm_lang$core$Native_Scheduler.succeed({
+		width: window.innerWidth,
+		height: window.innerHeight
+	}));
+});
+
+return {
+	size: size
+};
+
+}();
+var _elm_lang$window$Window_ops = _elm_lang$window$Window_ops || {};
+_elm_lang$window$Window_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return task2;
+			},
+			task1);
 	});
-var _user$project$Main$graph = function (model) {
-	return A2(
-		_elm_lang$svg$Svg$svg,
-		{
-			ctor: '::',
-			_0: _elm_lang$svg$Svg_Attributes$width('120'),
-			_1: {
+var _elm_lang$window$Window$onSelfMsg = F3(
+	function (router, dimensions, state) {
+		var _p1 = state;
+		if (_p1.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (_p2) {
+				var _p3 = _p2;
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					_p3._0(dimensions));
+			};
+			return A2(
+				_elm_lang$window$Window_ops['&>'],
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p1._0.subs)),
+				_elm_lang$core$Task$succeed(state));
+		}
+	});
+var _elm_lang$window$Window$init = _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+var _elm_lang$window$Window$size = _elm_lang$window$Native_Window.size;
+var _elm_lang$window$Window$width = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.width;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$height = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.height;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var _p4 = {ctor: '_Tuple2', _0: oldState, _1: newSubs};
+		if (_p4._0.ctor === 'Nothing') {
+			if (_p4._1.ctor === '[]') {
+				return _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+			} else {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (pid) {
+						return _elm_lang$core$Task$succeed(
+							_elm_lang$core$Maybe$Just(
+								{subs: newSubs, pid: pid}));
+					},
+					_elm_lang$core$Process$spawn(
+						A3(
+							_elm_lang$dom$Dom_LowLevel$onWindow,
+							'resize',
+							_elm_lang$core$Json_Decode$succeed(
+								{ctor: '_Tuple0'}),
+							function (_p5) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									_elm_lang$core$Platform$sendToSelf(router),
+									_elm_lang$window$Window$size);
+							})));
+			}
+		} else {
+			if (_p4._1.ctor === '[]') {
+				return A2(
+					_elm_lang$window$Window_ops['&>'],
+					_elm_lang$core$Process$kill(_p4._0._0.pid),
+					_elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing));
+			} else {
+				return _elm_lang$core$Task$succeed(
+					_elm_lang$core$Maybe$Just(
+						{subs: newSubs, pid: _p4._0._0.pid}));
+			}
+		}
+	});
+var _elm_lang$window$Window$subscription = _elm_lang$core$Native_Platform.leaf('Window');
+var _elm_lang$window$Window$Size = F2(
+	function (a, b) {
+		return {width: a, height: b};
+	});
+var _elm_lang$window$Window$MySub = function (a) {
+	return {ctor: 'MySub', _0: a};
+};
+var _elm_lang$window$Window$resizes = function (tagger) {
+	return _elm_lang$window$Window$subscription(
+		_elm_lang$window$Window$MySub(tagger));
+};
+var _elm_lang$window$Window$subMap = F2(
+	function (func, _p6) {
+		var _p7 = _p6;
+		return _elm_lang$window$Window$MySub(
+			function (_p8) {
+				return func(
+					_p7._0(_p8));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
+
+var _user$project$Main$iteration = F3(
+	function (amount, deposit, rate) {
+		return (amount * (rate + 1.0)) + deposit;
+	});
+var _user$project$Main$applied = F3(
+	function (p, d, t) {
+		return p + (d * t);
+	});
+var _user$project$Main$total = F4(
+	function (p, d, r, t) {
+		return _elm_lang$core$Native_Utils.eq(r, 0) ? A3(_user$project$Main$applied, p, d, t) : (((p + (d / r)) * Math.pow(1.0 + r, t)) - (d / r));
+	});
+var _user$project$Main$interest = F4(
+	function (p, d, r, t) {
+		return A4(_user$project$Main$total, p, d, r, t) - A3(_user$project$Main$applied, p, d, t);
+	});
+var _user$project$Main$graphLine = F4(
+	function ($function, range, plotPoint, color) {
+		return A2(
+			_elm_lang$svg$Svg$polyline,
+			{
 				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$height('120'),
+				_0: _elm_lang$svg$Svg_Attributes$fill('none'),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$viewBox('0 0 120 120'),
-					_1: {ctor: '[]'}
-				}
-			}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$svg$Svg$polyline,
-				{
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$fill('none'),
+					_0: _elm_lang$svg$Svg_Attributes$class(color),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
+						_0: _elm_lang$svg$Svg_Attributes$strokeWidth('2'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$points('20,100 40,60 70,80 100,20'),
+							_0: _elm_lang$svg$Svg_Attributes$points(
+								A2(
+									_elm_lang$core$String$join,
+									' ',
+									A2(
+										_elm_lang$core$List$map,
+										function (p) {
+											return A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(
+													_elm_lang$core$Tuple$first(p)),
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													',',
+													_elm_lang$core$Basics$toString(
+														_elm_lang$core$Tuple$second(p))));
+										},
+										A2(
+											_elm_lang$core$List$map,
+											plotPoint,
+											A2(
+												_elm_lang$core$List$map,
+												$function,
+												A2(_elm_lang$core$List$range, 0, range)))))),
 							_1: {ctor: '[]'}
 						}
 					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		});
+				}
+			},
+			{ctor: '[]'});
+	});
+var _user$project$Main$formatFloat = function (f) {
+	if (_elm_lang$core$Native_Utils.cmp(f, 1000000000000000) > 0) {
+		return 'Mais de 1.000.000.000.000.000';
+	} else {
+		if (_elm_lang$core$Native_Utils.eq(f, 0)) {
+			return '0,00';
+		} else {
+			if (_elm_lang$core$Native_Utils.cmp(f, 1) < 0) {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'0,',
+					_elm_lang$core$Basics$toString(
+						_elm_lang$core$Basics$floor(f * 100)));
+			} else {
+				var original = _elm_lang$core$Basics$toString(
+					_elm_lang$core$Basics$floor(f * 100));
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Tuple$second(
+						A3(
+							_elm_lang$core$String$foldr,
+							F2(
+								function (c, res) {
+									var $char = _elm_lang$core$String$fromChar(c);
+									var str = _elm_lang$core$Tuple$second(res);
+									var count = _elm_lang$core$Tuple$first(res);
+									return {
+										ctor: '_Tuple2',
+										_0: count + 1,
+										_1: ((!_elm_lang$core$Native_Utils.eq(count, 0)) && _elm_lang$core$Native_Utils.eq(
+											A2(_elm_lang$core$Basics_ops['%'], count, 3),
+											0)) ? A2(
+											_elm_lang$core$Basics_ops['++'],
+											$char,
+											A2(_elm_lang$core$Basics_ops['++'], '.', str)) : A2(_elm_lang$core$Basics_ops['++'], $char, str)
+									};
+								}),
+							{ctor: '_Tuple2', _0: 0, _1: ''},
+							A2(_elm_lang$core$String$dropRight, 2, original))),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						',',
+						A2(_elm_lang$core$String$right, 2, original)));
+			}
+		}
+	}
 };
+var _user$project$Main$convertToRange = F5(
+	function (value, r1, s1, r2, s2) {
+		return (((value - s1) / (r1 - s1)) * (r2 - s2)) + s2;
+	});
 var _user$project$Main$Model = F2(
 	function (a, b) {
 		return {form: a, results: b};
@@ -8657,8 +9453,581 @@ var _user$project$Main$stringToRateType = function (t) {
 var _user$project$Main$Years = {ctor: 'Years'};
 var _user$project$Main$model = A2(
 	_user$project$Main$Model,
-	{start_value: 0.0, deposit: 0.0, rate: 0.0, rate_type: _user$project$Main$Yearly, time: 0, time_type: _user$project$Main$Years},
+	{start_value: 0.0, deposit: 0.0, rate: 0.0, rate_type: _user$project$Main$Yearly, time: 1, time_type: _user$project$Main$Years},
 	{});
+var _user$project$Main$graph = function (model) {
+	var graphValuesBase = function (max) {
+		return (_elm_lang$core$Native_Utils.cmp(max, 1000) < 0) ? '' : ((_elm_lang$core$Native_Utils.cmp(max, 1000000) < 0) ? '(Milhares)' : ((_elm_lang$core$Native_Utils.cmp(max, 1000000000) < 0) ? '(Milhões)' : '(Bilhões)'));
+	};
+	var formatGraphValue = F2(
+		function (value, max) {
+			return (_elm_lang$core$Native_Utils.cmp(max, 1000) < 0) ? _elm_lang$core$Basics$toString(value) : ((_elm_lang$core$Native_Utils.cmp(max, 1000000) < 0) ? _elm_lang$core$Basics$toString(value / 1000) : ((_elm_lang$core$Native_Utils.cmp(max, 1000000000) < 0) ? _elm_lang$core$Basics$toString(value / 1000000) : _elm_lang$core$Basics$toString(value / 1000000000)));
+		});
+	var plot2 = function (n) {
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Basics$toFloat(n),
+			_1: A3(
+				_user$project$Main$applied,
+				model.form.start_value,
+				model.form.deposit,
+				_elm_lang$core$Basics$toFloat(n))
+		};
+	};
+	var start_value = model.form.start_value;
+	var graphPadY = 50;
+	var graphY = graphPadY;
+	var graphPadX = 100;
+	var graphX = graphPadX;
+	var valuesY = 0;
+	var valuesX = 0;
+	var svgHeight = 400;
+	var graphHeight = _elm_lang$core$Basics$toFloat(svgHeight) - graphPadY;
+	var rectHeight = svgHeight - (2 * graphPadY);
+	var svgWidth = 900;
+	var graphWidth = svgWidth - graphPadX;
+	var rectWidth = svgWidth - (2 * graphPadX);
+	var time = A2(
+		_elm_lang$core$Basics$max,
+		1,
+		A2(
+			_elm_lang$core$Basics$min,
+			1000 * 12,
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Native_Utils.eq(model.form.time_type, _user$project$Main$Years) ? (model.form.time * 12) : model.form.time)));
+	var appliedValue = A3(_user$project$Main$applied, model.form.start_value, model.form.deposit, time);
+	var valuesWidth = time;
+	var range = _elm_lang$core$Basics$floor(valuesWidth);
+	var formatResults = function (v) {
+		return (_elm_lang$core$Native_Utils.cmp(time, 12000) < 0) ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			'R$ ',
+			_user$project$Main$formatFloat(v)) : '---';
+	};
+	var rate = _elm_lang$core$Native_Utils.eq(model.form.rate_type, _user$project$Main$Yearly) ? (Math.pow(1 + (model.form.rate / 100), 1 / 12) - 1) : (model.form.rate / 100);
+	var finalValue = A4(_user$project$Main$total, model.form.start_value, model.form.deposit, rate, time);
+	var valuesHeight = (_elm_lang$core$Native_Utils.cmp(finalValue, 10) < 0) ? 10 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 100) < 0) ? 100 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 1000) < 0) ? 1000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 10000) < 0) ? 10000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 100000) < 0) ? 100000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 1000000) < 0) ? 1000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 10000000) < 0) ? 10000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 100000000) < 0) ? 100000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 1000000000) < 0) ? 1000000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 10000000000) < 0) ? 10000000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 100000000000) < 0) ? 100000000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 1000000000000) < 0) ? 1000000000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 10000000000000) < 0) ? 10000000000000 : ((_elm_lang$core$Native_Utils.cmp(finalValue, 100000000000000) < 0) ? 100000000000000 : 1000000000000000)))))))))))));
+	var graphPlotPoint = function (p) {
+		return {
+			ctor: '_Tuple2',
+			_0: A5(
+				_user$project$Main$convertToRange,
+				_elm_lang$core$Tuple$first(p),
+				valuesWidth,
+				valuesX,
+				graphWidth,
+				graphX),
+			_1: _elm_lang$core$Basics$toFloat(svgHeight) - A2(
+				_elm_lang$core$Basics$max,
+				graphY,
+				A2(
+					_elm_lang$core$Basics$min,
+					graphHeight,
+					A5(
+						_user$project$Main$convertToRange,
+						_elm_lang$core$Tuple$second(p),
+						valuesHeight,
+						valuesY,
+						graphHeight,
+						graphY)))
+		};
+	};
+	var plot1 = function (n) {
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Basics$toFloat(n),
+			_1: A4(
+				_user$project$Main$total,
+				model.form.start_value,
+				model.form.deposit,
+				rate,
+				_elm_lang$core$Basics$toFloat(n))
+		};
+	};
+	var plot3 = function (n) {
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Basics$toFloat(n),
+			_1: A4(
+				_user$project$Main$interest,
+				model.form.start_value,
+				model.form.deposit,
+				rate,
+				_elm_lang$core$Basics$toFloat(n))
+		};
+	};
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('results-wrapper'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('results'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('results-item final'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('results-title'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Valor Final: '),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('results-value'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											formatResults(finalValue)),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('results-item applied'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('results-title'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Montante aplicado: '),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('results-value'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												formatResults(appliedValue)),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('results-item interest'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('results-title'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Rendimento (Juros): '),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('results-value'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(
+													formatResults(finalValue - appliedValue)),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('results-item monthly'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('results-title'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Rendimento mensal médio: '),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('results-value'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(
+														formatResults((finalValue - appliedValue) / time)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('graph-wrapper'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$svg$Svg$svg,
+							{
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$class('graph'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$width(
+										_elm_lang$core$Basics$toString(svgWidth)),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$height(
+											_elm_lang$core$Basics$toString(svgHeight)),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$viewBox(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													'0 0 ',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_lang$core$Basics$toString(svgWidth),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															' ',
+															_elm_lang$core$Basics$toString(svgHeight))))),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$svg$Svg$rect,
+									{
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$fill('#fefefe'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$stroke('#ccc'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$x(
+													_elm_lang$core$Basics$toString(graphX)),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$y(
+														_elm_lang$core$Basics$toString(graphY)),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$width(
+															_elm_lang$core$Basics$toString(rectWidth)),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$height(
+																_elm_lang$core$Basics$toString(rectHeight)),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$svg$Svg$g,
+										{ctor: '[]'},
+										A2(
+											_elm_lang$core$List$map,
+											function (n) {
+												var value = (_elm_lang$core$Basics$toFloat(n) * valuesHeight) / 5;
+												var y = _elm_lang$core$Basics$toFloat(svgHeight) - A5(_user$project$Main$convertToRange, value, valuesHeight, valuesY, graphHeight, graphY);
+												return A2(
+													_elm_lang$svg$Svg$g,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$svg$Svg$text_,
+															{
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$textAnchor('end'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$x(
+																		_elm_lang$core$Basics$toString(graphX - 5)),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$svg$Svg_Attributes$y(
+																			_elm_lang$core$Basics$toString(y + 6)),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$svg$Svg$text(
+																	A2(formatGraphValue, value, valuesHeight)),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$svg$Svg$line,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$stroke('#ccc'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$svg$Svg_Attributes$x1(
+																			_elm_lang$core$Basics$toString(graphX)),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$svg$Svg_Attributes$x2(
+																				_elm_lang$core$Basics$toString(graphWidth)),
+																			_1: {
+																				ctor: '::',
+																				_0: _elm_lang$svg$Svg_Attributes$y1(
+																					_elm_lang$core$Basics$toString(y)),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$svg$Svg_Attributes$y2(
+																						_elm_lang$core$Basics$toString(y)),
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		}
+																	}
+																},
+																{ctor: '[]'}),
+															_1: {ctor: '[]'}
+														}
+													});
+											},
+											A2(_elm_lang$core$List$range, 0, 5))),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$svg$Svg$text_,
+											{
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$textAnchor('start'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$x('0'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$y('200'),
+														_1: {ctor: '[]'}
+													}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$svg$Svg$text('Valor (R$)'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$svg$Svg$text_,
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$textAnchor('start'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$x('0'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$y('218'),
+															_1: {ctor: '[]'}
+														}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg$text(
+														graphValuesBase(valuesHeight)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$svg$Svg$g,
+													{ctor: '[]'},
+													A2(
+														_elm_lang$core$List$map,
+														function (n) {
+															var value = (_elm_lang$core$Basics$toFloat(n) * valuesWidth) / 12;
+															var x = A5(_user$project$Main$convertToRange, value, valuesWidth, valuesX, graphWidth, graphX);
+															return A2(
+																_elm_lang$svg$Svg$g,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$svg$Svg$text_,
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
+																			_1: {
+																				ctor: '::',
+																				_0: _elm_lang$svg$Svg_Attributes$x(
+																					_elm_lang$core$Basics$toString(x)),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$svg$Svg_Attributes$y(
+																						_elm_lang$core$Basics$toString(graphHeight + 15)),
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$svg$Svg$text(
+																				_elm_lang$core$Basics$toString(
+																					_elm_lang$core$Basics$toFloat(
+																						_elm_lang$core$Basics$floor(value * 10)) / 10)),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																});
+														},
+														A2(_elm_lang$core$List$range, 1, 12))),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$svg$Svg$text_,
+														{
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$x(
+																	_elm_lang$core$Basics$toString(graphWidth / 2)),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$y(
+																		_elm_lang$core$Basics$toString(graphHeight + 35)),
+																	_1: {ctor: '[]'}
+																}
+															}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$svg$Svg$text('Meses'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A4(_user$project$Main$graphLine, plot1, range, graphPlotPoint, 'final'),
+														_1: {
+															ctor: '::',
+															_0: A4(_user$project$Main$graphLine, plot2, range, graphPlotPoint, 'applied'),
+															_1: {
+																ctor: '::',
+																_0: A4(_user$project$Main$graphLine, plot3, range, graphPlotPoint, 'interest'),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Main$Months = {ctor: 'Months'};
 var _user$project$Main$timeTypetoString = function (t) {
 	return _elm_lang$core$Native_Utils.eq(t, _user$project$Main$Months) ? 'Meses' : 'Anos';
@@ -8768,35 +10137,128 @@ var _user$project$Main$view = function (model) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: A3(
-				_elm_lang$html$Html$node,
-				'link',
+			_0: A2(
+				_elm_lang$html$Html$form,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$rel('stylesheet'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href('calculator.css'),
-						_1: {ctor: '[]'}
-					}
+					_0: _elm_lang$html$Html_Attributes$class('calc-form'),
+					_1: {ctor: '[]'}
 				},
-				{ctor: '[]'}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h1,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Calculadora de juros compostos'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
+				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$form,
-						{ctor: '[]'},
+						_elm_lang$html$Html$div,
 						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('input-wrapper'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$label,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$for('start_value'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Valor Inicial'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$type_('number'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$name('start_value'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$step('1000'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$min('0'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$StartValue),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$value(
+																_elm_lang$core$Basics$toString(model.form.start_value)),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('input-wrapper'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$label,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$for('deposit'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Aporte mensal'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$input,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$type_('number'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$name('deposit'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$step('100'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$min('0'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Deposit),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$value(
+																	_elm_lang$core$Basics$toString(model.form.deposit)),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$div,
@@ -8811,12 +10273,12 @@ var _user$project$Main$view = function (model) {
 										_elm_lang$html$Html$label,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$for('start_value'),
+											_0: _elm_lang$html$Html_Attributes$for('rate'),
 											_1: {ctor: '[]'}
 										},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Valor Inicial'),
+											_0: _elm_lang$html$Html$text('Taxa(%)'),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
@@ -8828,15 +10290,23 @@ var _user$project$Main$view = function (model) {
 												_0: _elm_lang$html$Html_Attributes$type_('number'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$name('start_value'),
+													_0: _elm_lang$html$Html_Attributes$name('rate'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$StartValue),
+														_0: _elm_lang$html$Html_Attributes$step('0.50'),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$value(
-																_elm_lang$core$Basics$toString(model.form.start_value)),
-															_1: {ctor: '[]'}
+															_0: _elm_lang$html$Html_Attributes$min('0'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Rate),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$value(
+																		_elm_lang$core$Basics$toString(model.form.rate)),
+																	_1: {ctor: '[]'}
+																}
+															}
 														}
 													}
 												}
@@ -8860,37 +10330,64 @@ var _user$project$Main$view = function (model) {
 											_elm_lang$html$Html$label,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$for('deposit'),
+												_0: _elm_lang$html$Html_Attributes$for('rate_type'),
 												_1: {ctor: '[]'}
 											},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('Aporte mensal'),
+												_0: _elm_lang$html$Html$text('Por'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {
 											ctor: '::',
 											_0: A2(
-												_elm_lang$html$Html$input,
+												_elm_lang$html$Html$select,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$type_('number'),
+													_0: _elm_lang$html$Html_Attributes$name('rate_type'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$name('deposit'),
+														_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$RateKind),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Deposit),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$value(
-																	_elm_lang$core$Basics$toString(model.form.deposit)),
-																_1: {ctor: '[]'}
-															}
+															_0: _elm_lang$html$Html_Attributes$value(
+																_user$project$Main$rateTypetoString(model.form.rate_type)),
+															_1: {ctor: '[]'}
 														}
 													}
 												},
-												{ctor: '[]'}),
+												A2(
+													_elm_lang$core$List$map,
+													function (val) {
+														return A2(
+															_elm_lang$html$Html$option,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$value(val),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$selected(
+																		_elm_lang$core$Native_Utils.eq(
+																			model.form.rate_type,
+																			_user$project$Main$stringToRateType(val))),
+																	_1: {ctor: '[]'}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text(val),
+																_1: {ctor: '[]'}
+															});
+													},
+													{
+														ctor: '::',
+														_0: 'Mês',
+														_1: {
+															ctor: '::',
+															_0: 'Ano',
+															_1: {ctor: '[]'}
+														}
+													})),
 											_1: {ctor: '[]'}
 										}
 									}),
@@ -8909,12 +10406,12 @@ var _user$project$Main$view = function (model) {
 												_elm_lang$html$Html$label,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$for('rate'),
+													_0: _elm_lang$html$Html_Attributes$for('time'),
 													_1: {ctor: '[]'}
 												},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Taxa(%)'),
+													_0: _elm_lang$html$Html$text('Tempo aplicado'),
 													_1: {ctor: '[]'}
 												}),
 											_1: {
@@ -8926,15 +10423,27 @@ var _user$project$Main$view = function (model) {
 														_0: _elm_lang$html$Html_Attributes$type_('number'),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$name('rate'),
+															_0: _elm_lang$html$Html_Attributes$name('time'),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Rate),
+																_0: _elm_lang$html$Html_Attributes$value('1'),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$value(
-																		_elm_lang$core$Basics$toString(model.form.rate)),
-																	_1: {ctor: '[]'}
+																	_0: _elm_lang$html$Html_Attributes$min('1'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$max('1000'),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Time),
+																			_1: {
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$value(
+																					_elm_lang$core$Basics$toString(model.form.time)),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
 																}
 															}
 														}
@@ -8958,12 +10467,12 @@ var _user$project$Main$view = function (model) {
 													_elm_lang$html$Html$label,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$for('rate_type'),
+														_0: _elm_lang$html$Html_Attributes$for('time_type'),
 														_1: {ctor: '[]'}
 													},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('Por'),
+														_0: _elm_lang$html$Html$text('Em'),
 														_1: {ctor: '[]'}
 													}),
 												_1: {
@@ -8972,14 +10481,14 @@ var _user$project$Main$view = function (model) {
 														_elm_lang$html$Html$select,
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$name('rate_type'),
+															_0: _elm_lang$html$Html_Attributes$name('time_type'),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$RateKind),
+																_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$TimeKind),
 																_1: {
 																	ctor: '::',
 																	_0: _elm_lang$html$Html_Attributes$value(
-																		_user$project$Main$rateTypetoString(model.form.rate_type)),
+																		_user$project$Main$timeTypetoString(model.form.time_type)),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -8996,8 +10505,8 @@ var _user$project$Main$view = function (model) {
 																			ctor: '::',
 																			_0: _elm_lang$html$Html_Attributes$selected(
 																				_elm_lang$core$Native_Utils.eq(
-																					model.form.rate_type,
-																					_user$project$Main$stringToRateType(val))),
+																					model.form.time_type,
+																					_user$project$Main$stringToTimeType(val))),
 																			_1: {ctor: '[]'}
 																		}
 																	},
@@ -9009,183 +10518,27 @@ var _user$project$Main$view = function (model) {
 															},
 															{
 																ctor: '::',
-																_0: 'Mês',
+																_0: 'Meses',
 																_1: {
 																	ctor: '::',
-																	_0: 'Ano',
+																	_0: 'Anos',
 																	_1: {ctor: '[]'}
 																}
 															})),
 													_1: {ctor: '[]'}
 												}
 											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$div,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('input-wrapper'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$label,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$for('time'),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Tempo aplicado'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$input,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$type_('number'),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$name('time'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$Time),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$value(
-																				_elm_lang$core$Basics$toString(model.form.time)),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}
-															},
-															{ctor: '[]'}),
-														_1: {ctor: '[]'}
-													}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$div,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$class('input-wrapper'),
-														_1: {ctor: '[]'}
-													},
-													{
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$label,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$for('time_type'),
-																_1: {ctor: '[]'}
-															},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Em'),
-																_1: {ctor: '[]'}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$select,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$name('time_type'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$TimeKind),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$value(
-																				_user$project$Main$timeTypetoString(model.form.time_type)),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																},
-																A2(
-																	_elm_lang$core$List$map,
-																	function (val) {
-																		return A2(
-																			_elm_lang$html$Html$option,
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html_Attributes$value(val),
-																				_1: {
-																					ctor: '::',
-																					_0: _elm_lang$html$Html_Attributes$selected(
-																						_elm_lang$core$Native_Utils.eq(
-																							model.form.time_type,
-																							_user$project$Main$stringToTimeType(val))),
-																					_1: {ctor: '[]'}
-																				}
-																			},
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html$text(val),
-																				_1: {ctor: '[]'}
-																			});
-																	},
-																	{
-																		ctor: '::',
-																		_0: 'Meses',
-																		_1: {
-																			ctor: '::',
-																			_0: 'Anos',
-																			_1: {ctor: '[]'}
-																		}
-																	})),
-															_1: {ctor: '[]'}
-														}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$button,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$type_('button'),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Calcular'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												}
-											}
-										}
+										_1: {ctor: '[]'}
 									}
 								}
 							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(
-										A4(
-											_user$project$Main$calculate,
-											model.form.start_value,
-											model.form.rate / 100.0,
-											12.0,
-											_elm_lang$core$Basics$toFloat(model.form.time)))),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+						}
 					}
-				}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Main$graph(model),
+				_1: {ctor: '[]'}
 			}
 		});
 };

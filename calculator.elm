@@ -167,9 +167,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     main_ []
-        [ Html.node "link" [ rel "stylesheet", href "calculator.css" ] []
-        , h1 [] [ text "Calculadora de juros compostos" ]
-        , Html.form []
+        [Html.form [ class "calc-form"]
             [ div [ class "input-wrapper" ]
                 [ label [ for "start_value" ] [ text "Valor Inicial" ]
                 , input
@@ -260,7 +258,7 @@ graph model =
     svgWidth =
       900
     svgHeight =
-      svgWidth // 3
+      400
     finalValue =
       (total model.form.start_value model.form.deposit rate time)
     appliedValue =
@@ -268,15 +266,44 @@ graph model =
     valuesWidth =
       time
     valuesHeight =
-      1.2 * finalValue
+      if finalValue < 10 then
+        10
+      else if finalValue < 100 then
+        100
+      else if finalValue < 1000 then
+        1000
+      else if finalValue < 10000 then
+        10000
+      else if finalValue < 100000 then
+        100000
+      else if finalValue < 1000000 then
+        1000000
+      else if finalValue < 10000000 then
+        10000000
+      else if finalValue < 100000000 then
+        100000000
+      else if finalValue < 1000000000 then
+        1000000000
+      else if finalValue < 10000000000 then
+        10000000000
+      else if finalValue < 100000000000 then
+        100000000000
+      else if finalValue < 1000000000000 then
+        1000000000000
+      else if finalValue < 10000000000000 then
+        10000000000000
+      else if finalValue < 100000000000000 then
+        100000000000000
+      else
+        1000000000000000
     valuesX =
       0
     valuesY =
       0
     graphPadX =
-      20
+      100
     graphPadY =
-      10
+      50
     graphWidth =
       svgWidth - graphPadX
     rectWidth =
@@ -303,7 +330,7 @@ graph model =
       ( (convertToRange
           (Tuple.first p)
           valuesWidth
-          (2*valuesX)
+          valuesX
           graphWidth
           graphX
         )
@@ -320,7 +347,25 @@ graph model =
         ))
       )
     formatResults v =
-      if time < 12000 then formatFloat v else "---"
+      if time < 12000 then "R$ " ++ (formatFloat v) else "---"
+    formatGraphValue value max =
+      if max < 1000 then
+        toString value
+      else if max < 1000000 then
+        toString (value/1000)
+      else if max < 1000000000 then
+        toString (value/1000000)
+      else
+        toString (value/1000000000)
+    graphValuesBase max =
+      if max < 1000 then
+        ""
+      else if max < 1000000 then
+        "(Milhares)"
+      else if max < 1000000000 then
+        "(Milhões)"
+      else
+        "(Bilhões)"
   in
     div [ class "results-wrapper"]
     [ div [ class "results" ]
@@ -336,7 +381,7 @@ graph model =
         [ div [ class "results-title" ] [text "Rendimento (Juros): "]
         , div [ class "results-value" ] [ text (formatResults (finalValue - appliedValue)) ]
         ]
-      , div [ class "results-item" ]
+      , div [ class "results-item monthly" ]
         [ div [ class "results-title" ] [text "Rendimento mensal médio: "]
         , div [ class "results-value" ] [ text (formatResults ((finalValue - appliedValue)/time)) ]
         ]
@@ -349,20 +394,92 @@ graph model =
           , Svg.Attributes.height (toString svgHeight)
           , Svg.Attributes.viewBox ("0 0 " ++ toString svgWidth ++ " " ++ toString svgHeight)
           ]
-          [ Svg.text_
-            [ Svg.Attributes.x (toString (graphX+graphWidth))
-            , Svg.Attributes.y (toString 50)
+          [ Svg.rect
+              [ Svg.Attributes.fill "#fefefe"
+              , Svg.Attributes.stroke "#ccc"
+              , Svg.Attributes.x (toString graphX)
+              , Svg.Attributes.y (toString graphY)
+              , Svg.Attributes.width (toString rectWidth)
+              , Svg.Attributes.height (toString rectHeight)
+              ]
+              []
+          , Svg.g []
+            (List.map
+              (\n ->
+                let
+                  value =
+                    (toFloat n) * valuesHeight/5
+                  y =
+                    (toFloat svgHeight) -
+                    (convertToRange
+                      value
+                      valuesHeight
+                      valuesY
+                      graphHeight
+                      graphY)
+                in
+                Svg.g []
+                [ Svg.text_
+                    [ Svg.Attributes.textAnchor "end"
+                    , Svg.Attributes.x (toString (graphX-5))
+                    , Svg.Attributes.y (toString (y+6))
+                    ]
+                    [Svg.text (formatGraphValue value valuesHeight)]
+                , Svg.line
+                  [ Svg.Attributes.stroke "#ccc"
+                  , Svg.Attributes.x1 (toString graphX)
+                  , Svg.Attributes.x2 (toString graphWidth)
+                  , Svg.Attributes.y1 (toString y)
+                  , Svg.Attributes.y2 (toString y)
+                  ]
+                  []
+                ]
+              )
+              (List.range 0 5)
+            )
+          , Svg.text_
+            [ Svg.Attributes.textAnchor "start"
+            , Svg.Attributes.x "0"
+            , Svg.Attributes.y "200"
             ]
-            [Svg.text "0"]
-          , Svg.rect
-            [ Svg.Attributes.fill "#fefefe"
-            , Svg.Attributes.stroke "#ccc"
-            , Svg.Attributes.x (toString graphX)
-            , Svg.Attributes.y (toString graphY)
-            , Svg.Attributes.width (toString rectWidth)
-            , Svg.Attributes.height (toString rectHeight)
+            [Svg.text "Valor (R$)"]
+          , Svg.text_
+            [ Svg.Attributes.textAnchor "start"
+            , Svg.Attributes.x "0"
+            , Svg.Attributes.y "218"
             ]
-            []
+            [Svg.text (graphValuesBase valuesHeight)]
+          , Svg.g []
+            (List.map
+              (\n ->
+                let
+                  value =
+                    (toFloat n) * valuesWidth/12
+                  x =
+                    (convertToRange
+                      value
+                      valuesWidth
+                      valuesX
+                      graphWidth
+                      graphX)
+                in
+                Svg.g []
+                [ Svg.text_
+                    [ Svg.Attributes.textAnchor "middle"
+                    , Svg.Attributes.x (toString x)
+                    , Svg.Attributes.y (toString (graphHeight + 15))
+                    ]
+                    [Svg.text (toString (toFloat (floor (value*10)) / 10))]
+                ]
+              )
+              (List.range 1 12)
+            )
+          , Svg.text_
+            [ Svg.Attributes.textAnchor "middle"
+            , Svg.Attributes.x (toString (graphWidth / 2))
+            , Svg.Attributes.y (toString (graphHeight + 35))
+            ]
+            [Svg.text "Meses"]
           , (graphLine plot1 range graphPlotPoint "final")
           , (graphLine plot2 range graphPlotPoint "applied")
           , (graphLine plot3 range graphPlotPoint "interest")

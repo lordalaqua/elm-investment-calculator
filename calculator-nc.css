@@ -1,0 +1,128 @@
+html {
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+}
+* {
+    -webkit-box-sizing: inherit;
+            box-sizing: inherit;
+}
+
+.calc-form {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    margin: auto;
+    max-width: 40em;
+}
+
+.calc-form input, .calc-form select {
+    border: 1px solid #adadad;
+    background-color: #fff;
+    border-radius: 2px;
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    height: 2.5em;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+}
+
+.input-wrapper {
+    -webkit-box-flex: 0;
+        -ms-flex: 0 1 50%;
+            flex: 0 1 50%;
+    padding: 0 5px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+}
+
+.graph-wrapper {
+    padding: 0;
+    margin: auto;
+    max-width: 60em;
+}
+
+.graph {
+    width: 100%;
+    height: auto;
+    margin-bottom: 300px;
+}
+
+.results {
+    max-width: 60em;
+    margin: auto;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+}
+
+.results-item {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch;
+    text-align: center;
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+    border-radius: 3px;
+    margin: 10px;
+    overflow: hidden;
+}
+
+.results-title {
+    padding: 10px;
+    background-color:  #ececec;
+    border-bottom: 2px solid #666;
+}
+
+.results-value {
+    padding: 10px;
+    background-color: #ececec;
+}
+
+.final {
+    stroke: #7ea818;
+}
+
+.final > .results-title {
+    border-bottom: 2px solid #7ea818;
+}
+
+.applied {
+    stroke: #5b8dbd;
+}
+
+.applied > .results-title {
+    border-bottom: 2px solid #5b8dbd;
+}
+
+.interest {
+    stroke: #f80;
+}
+
+.interest > .results-title {
+    border-bottom: 2px solid #f80;
+}
