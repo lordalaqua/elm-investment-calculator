@@ -38,36 +38,16 @@ formatFloat f =
 
 maxGraphValue : Float -> Float
 maxGraphValue value =
-  if value < 10 then
-    10
-  else if value < 100 then
-    100
-  else if value < 1000 then
-    1000
-  else if value < 10000 then
-    10000
-  else if value < 100000 then
-    100000
-  else if value < 1000000 then
-    1000000
-  else if value < 10000000 then
-    10000000
-  else if value < 100000000 then
-    100000000
-  else if value < 1000000000 then
-    1000000000
-  else if value < 10000000000 then
-    10000000000
-  else if value < 100000000000 then
-    100000000000
-  else if value < 1000000000000 then
-    1000000000000
-  else if value < 10000000000000 then
-    10000000000000
-  else if value < 100000000000000 then
-    100000000000000
-  else
-    1000000000000000
+  List.foldr
+    (\n -> \res -> if value < n then n else res)--if res == 0 then if value < n then n else 0 else res)
+    (10^15)
+    (List.concat
+      [ (List.map (\n -> toFloat (10^n)) (List.range 1 4))
+      , (List.map (\n -> toFloat (n*10000)) (List.range 2 10))
+      , (List.map (\n -> toFloat (n*100000)) (List.range 2 10))
+      , (List.map (\n -> toFloat (n*5000000)) (List.range 1 20))
+      , (List.map (\n -> toFloat (10^n)) (List.range 9 15))
+      ])
 
 graph : Model.Model -> Html.Html msg
 graph model =
@@ -159,11 +139,11 @@ graph model =
       if max < 1000 then
         ""
       else if max < 1000000 then
-        "(Milhares)"
+        "(x1000)"
       else if max < 1000000000 then
-        "(Milhões)"
+        "(x1 Milhão)"
       else
-        "(Bilhões)"
+        "(x1 Bilhão)"
   in
     div [ class "results-wrapper"]
     [ div [ class "results" ]

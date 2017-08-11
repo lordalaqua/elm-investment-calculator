@@ -94,13 +94,13 @@ html {
 
 .results-title {
     padding: 10px;
-    background-color:  #ececec;
+    background-color:  #f5f5f5;
     border-bottom: 2px solid #666;
 }
 
 .results-value {
     padding: 10px;
-    background-color: #ececec;
+    background-color: #f5f5f5;
 }
 
 .final {
