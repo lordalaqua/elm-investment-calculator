@@ -3,7 +3,7 @@ module Form exposing (calculatorForm)
 import Model
 import Update
 import Html exposing (form, div, label, input, select, option, text)
-import Html.Attributes exposing (class, for, type_, name, step, value, selected)
+import Html.Attributes exposing (class, for, type_, name, step, value, selected, pattern, defaultValue)
 import Html.Events exposing (onInput)
 
 calculatorForm :  Model.Model -> Html.Html Update.Msg
@@ -12,36 +12,30 @@ calculatorForm model =
     [ div [ class "input-wrapper" ]
         [ label [ for "start_value" ] [ text "Valor Inicial" ]
         , input
-            [ type_ "number"
+            [ type_ "text"
             , name "start_value"
-            , step "1000"
-            , Html.Attributes.min "0"
             , onInput Update.StartValue
-            , value (toString model.start_value)
+            , defaultValue "0"
             ]
             []
         ]
     , div [ class "input-wrapper" ]
         [ label [ for "deposit" ] [ text "Aporte mensal" ]
         , input
-            [ type_ "number"
+            [ type_ "text"
             , name "deposit"
-            , step "100"
-            , Html.Attributes.min "0"
             , onInput Update.Deposit
-            , value (toString model.deposit)
+            , defaultValue "0"
             ]
             []
         ]
     , div [ class "input-wrapper" ]
         [ label [ for "rate" ] [ text "Taxa(%)" ]
         , input
-            [ type_ "number"
+            [ type_ "text"
             , name "rate"
-            , step "0.50"
-            , Html.Attributes.min "0"
             , onInput Update.Rate
-            , value (toString model.rate)
+            , defaultValue "0"
             ]
             []
         ]
